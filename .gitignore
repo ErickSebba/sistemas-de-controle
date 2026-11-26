@@ -36,3 +36,11 @@ material-de-downloads/
 *.docx
 *.pptx
 *.zip
+
+# Cache do Simulink (gerado ao simular)
+slprj/
+*.slxc
+
+# Documentos e material de estudo (ficam só no disco); README fica
+*.md
+!README.md
