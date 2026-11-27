@@ -2,6 +2,7 @@
 """Sintonia robusta do PID 2-DOF (c=0, convencao do curso) - planta Entrega 2."""
 import numpy as np, control as ct, warnings; warnings.filterwarnings("ignore")
 from scipy.optimize import minimize
+from pathlib import Path
 trapz = np.trapezoid if hasattr(np,"trapezoid") else np.trapz
 
 Kp,zeta,wn=2.8968e-03,0.0743,9.1069
@@ -59,7 +60,7 @@ print(f"  Regra Tac/20..30: {Tac/30*1000:.0f}..{Tac/20*1000:.0f} ms | Regra 2Tf:
 for Ts in [0.02]:
     zD=(2*Tf-Ts)/(2*Tf+Ts); print(f"  Ts={Ts*1000:.0f}ms: z_D={zD:+.3f} {'OK' if zD>0 else 'RINGING'}")
 
-np.savez('/home/claude/projeto_final/design.npz',
+np.savez(Path(__file__).resolve().parent / 'design.npz',
          num_P=[Kp*wn**2],den_P=[1.0,2*zeta*wn,wn**2],
          Kc=Kc,Ti=Ti,Td=Td,Tf=Tf,gamma=gamma,b=b,c=0.0,r0=r0,umax=umax,Ts=0.02)
 print("\nOK salvo.")

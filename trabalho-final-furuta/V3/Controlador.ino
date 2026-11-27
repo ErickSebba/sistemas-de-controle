@@ -14,19 +14,23 @@ const float    TS      = 0.020f;      // 20 ms  (50 Hz)
 const uint32_t TS_US   = 20000UL;
 
 
-/* --------------- SINTONIA  ------ */
-const float KC    = 90.0f; // 57.31f <- valor da sintonia LoopShaping/ITAE
-const float TI    = 1000.0f; //0.1015 <- valor da sintonia LoopShaping/ITAE
-const float TD    = 0.1f; //0.4777 <- valor da sintonia LoopShaping/ITAE
+/* --------------- SINTONIA ---------------------------- */
+/*  Foram testadas duas sintonias na bancada:
+ *    teorica (MATLAB, LoopShaping/ITAE): KC = 57.31, TI = 0.1015 s, TD = 0.4777 s
+ *    experimental (ajustada a mao na bancada): KC = 90, TI = 1000 s, TD = 0.1 s  <- em uso
+ *  Com TI = 1000 s o integral fica praticamente desligado (KI ~ 0.0009).            */
+const float KC    = 90.0f;            // experimental (teorica: 57.31)
+const float TI    = 1000.0f;          // experimental (teorica: 0.1015 s)
+const float TD    = 0.1f;             // experimental (teorica: 0.4777 s)
 const float GAMMA = 0.125f;           // 1/8  (filtro derivativo do curso)
-const float TF    = GAMMA * TD;       // 0.059713 s
+const float TF    = GAMMA * TD;       // 0.0125 s   (teorica: 0.059713 s)
 const float B_W   = 0.7f;             // peso b (proporcional na referencia)
 const float C_W   = 0.0f;             // peso c = 0 -> derivada so na medicao
 
 /* --------- COEFICIENTES PRE-CALCULADOS (Ts = 20 ms) --- */
-const float AD = TF / (TF + TS);            // 0.749098   (EULER)
-const float BD = KC * TD / (TF + TS);       // 343.4466   (EULER)
-const float KI = KC * TS / (2.0f * TI);     // 5.646305   (TUSTIN)
+const float AD = TF / (TF + TS);            // 0.384615   (EULER)   (teorica: 0.749098)
+const float BD = KC * TD / (TF + TS);       // 276.9231   (EULER)   (teorica: 343.4466)
+const float KI = KC * TS / (2.0f * TI);     // 0.0009     (TUSTIN)  (teorica: 5.646305)
 
 /* ------------- ZONA MORTA (medida em bancada) -------- */
 /*  Sentido + (anti-horario): motor parte em PWM ~120-140  -> adotado 130
@@ -93,10 +97,10 @@ float pid_2dof_discreto(float r, float y) {
     e  = 0.0f;
     P  = 0.0f;
     vD = 0.0f;
-    est_I  = 0.0f;    /* Esvaziletamente */
+    est_I  = 0.0f;    /* Esvazia o integrador */
     est_ud = 0.0f;    /* Zera a memória do derivativo para evitar trancos ao sair */
   } else {
-    e  = e_bruto ;//a o integrador para o motor desligar comp
+    e  = e_bruto;
     P  = KC * (B_W * r - y);
     vD = C_W * r - y;
   }

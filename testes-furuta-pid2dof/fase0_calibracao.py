@@ -24,6 +24,9 @@ com  a = Ib + mp*Lb^2 ;  c = mp*Lb*lp ;  Kg = mp*g*lp ;  J = inercia do pendulo 
 """
 import numpy as np, control as ct, warnings; warnings.filterwarnings("ignore")
 from scipy.optimize import least_squares
+from pathlib import Path
+AQUI = Path(__file__).resolve().parent          # saídas ao lado do script
+(AQUI / 'figs').mkdir(exist_ok=True)
 import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 plt.rcParams.update({"font.size":10.5,"axes.grid":True,"grid.alpha":.3,
                      "figure.dpi":150,"savefig.bbox":"tight"})
@@ -152,9 +155,9 @@ a2.set_ylabel('fase (graus)'); a2.set_xlabel('ω (rad/s)')
 a2.text(1.2, np.degrees(np.squeeze(ph_c))[0]+10,
         'em DC os modelos divergem\n(2 GDL tem zero na origem)',
         fontsize=8, color=VERM)
-fig.savefig('/home/claude/projeto_final/figs/n1_calibracao.png'); plt.close(fig)
+fig.savefig(AQUI / 'figs' / 'n1_calibracao.png'); plt.close(fig)
 
-np.savez('/home/claude/final/params_2gdl.npz',
+np.savez(AQUI / 'params_2gdl.npz',
          a=a, c=c, Kg=Kg, J=J, b_al=b_al, b_th=b_th, k_tau=k_tau,
          mp=mp, Lb=Lb, lp=lp, Ib=Ib, g=g)
 print("\nOK -> figs/n1_calibracao.png  e  params_2gdl.npz")
